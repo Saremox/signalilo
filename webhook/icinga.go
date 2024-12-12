@@ -116,8 +116,8 @@ func createServiceData(hostname string,
 	// Set defaults
 	serviceVars["bridge_uuid"] = config.UUID
 	serviceVars["keep_for"] = config.KeepFor
-	serviceVars = mapIcingaVariables(serviceVars, alert.Labels, "label_", l)
-	serviceVars = mapIcingaVariables(serviceVars, alert.Annotations, "annotation_", l)
+	//serviceVars = mapIcingaVariables(serviceVars, alert.Labels, "label_", l)
+	//serviceVars = mapIcingaVariables(serviceVars, alert.Annotations, "annotation_", l)
 	serviceVars = addStaticIcingaVariables(serviceVars, config.StaticServiceVars, l)
 
 	// Create service attrs object
