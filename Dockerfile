@@ -8,7 +8,7 @@
 #####################
 # STEP 1 build binary
 #####################
-FROM golang:1.20 as builder
+FROM golang:1.24 AS builder
 
 ARG BINARY_VERSION
 
