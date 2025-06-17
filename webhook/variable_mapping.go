@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/bketelsen/logr"
-	"github.com/vshn/go-icinga2-client/icinga2"
+	"github.com/saremox/go-icinga2-client/icinga2"
 )
 
 // Error messages
@@ -24,7 +24,7 @@ func mapIcingaVariables(vars icinga2.Vars, kv map[string]string, prefix string, 
 		vars[prefix+k] = v
 
 		kk, vv, err := mapIcingaVariable(k, v)
-		if err == ErrorNotAMappingKey {
+		if errors.Is(err, ErrorNotAMappingKey) {
 			continue
 		} else if err != nil {
 			log.Infof("Failed to map Icinga variable '%s': %s", k, err)
@@ -62,7 +62,7 @@ func mapIcingaVariable(key, value string) (string, interface{}, error) {
 
 func addStaticIcingaVariables(vars icinga2.Vars, staticVars map[string]string, log logr.Logger) icinga2.Vars {
 	for k, v := range staticVars {
-		// Only add static variable if it's not already set on the
+		// Only add a static variable if it's not already set on the
 		// service.
 		if ev, ok := vars[k]; ok {
 			log.V(2).Infof("Not adding static variable %v=%v to service; service already has %v=%v", k, v, k, ev)

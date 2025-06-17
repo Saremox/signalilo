@@ -13,8 +13,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/vshn/go-icinga2-client/icinga2"
-	"github.com/vshn/signalilo/config"
+	"github.com/saremox/go-icinga2-client/icinga2"
+	"github.com/saremox/signalilo/config"
 )
 
 // extractDowntime searches the provided downtime array for a downtime for

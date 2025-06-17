@@ -18,8 +18,8 @@ import (
 	"time"
 
 	"github.com/prometheus/alertmanager/template"
-	"github.com/vshn/go-icinga2-client/icinga2"
-	"github.com/vshn/signalilo/config"
+	"github.com/saremox/go-icinga2-client/icinga2"
+	"github.com/saremox/signalilo/config"
 )
 
 // validateServiceName checks that computed service name matches constraints
@@ -74,7 +74,7 @@ func computeServiceName(
 		return serviceName, nil
 	}
 
-	return "", fmt.Errorf("Service name '%v' doesn't match icinga2 constraints", serviceName)
+	return "", fmt.Errorf("service name '%v' doesn't match icinga2 constraints", serviceName)
 }
 
 // computeDisplayName computes a "human-readable" display name for Icinga2
@@ -116,8 +116,8 @@ func createServiceData(hostname string,
 	// Set defaults
 	serviceVars["bridge_uuid"] = config.UUID
 	serviceVars["keep_for"] = config.KeepFor
-	//serviceVars = mapIcingaVariables(serviceVars, alert.Labels, "label_", l)
-	//serviceVars = mapIcingaVariables(serviceVars, alert.Annotations, "annotation_", l)
+	serviceVars = mapIcingaVariables(serviceVars, alert.Labels, "label_", l)
+	serviceVars = mapIcingaVariables(serviceVars, alert.Annotations, "annotation_", l)
 	serviceVars = addStaticIcingaVariables(serviceVars, config.StaticServiceVars, l)
 
 	// Create service attrs object
@@ -179,7 +179,7 @@ func updateOrCreateService(icinga icinga2.Client,
 		}
 		interval, err := time.ParseDuration(val)
 		if err != nil {
-			return icinga2.Service{}, fmt.Errorf("Unable to parse heartbeat interval: %v", err)
+			return icinga2.Service{}, fmt.Errorf("unable to parse heartbeat interval: %v", err)
 		}
 		heartbeatInterval = interval
 	}

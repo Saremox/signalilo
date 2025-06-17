@@ -2,7 +2,7 @@
 
 Signalilo is our Alertmanager to Icinga2 bridge implementation. Signalilo acts
 on webhooks which it receives from Alertmanager and forwards the alerts in
-those webhooks to Icinga2 using https://github.com/vshn/go-icinga2-client.
+those webhooks to Icinga2 using https://github.com/saremox/go-icinga2-client.
 
 See [CHANGELOG.md](/CHANGELOG.md) for changelogs of each release version of
 Signalilo.

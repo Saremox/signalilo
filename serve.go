@@ -16,10 +16,10 @@ import (
 
 	"github.com/alecthomas/kingpin/v2"
 	"github.com/bketelsen/logr"
-	"github.com/vshn/go-icinga2-client/icinga2"
-	"github.com/vshn/signalilo/config"
-	"github.com/vshn/signalilo/gc"
-	"github.com/vshn/signalilo/webhook"
+	"github.com/saremox/go-icinga2-client/icinga2"
+	"github.com/saremox/signalilo/config"
+	"github.com/saremox/signalilo/gc"
+	"github.com/saremox/signalilo/webhook"
 )
 
 // ServeCommand holds all the configuration and objects necessary to serve the
@@ -201,7 +201,7 @@ func (s *ServeCommand) run(ctx *kingpin.ParseContext) error {
 
 func (s *ServeCommand) initialize(ctx *kingpin.ParseContext) error {
 	s.logger = config.NewLogger(s.logLevel)
-	config.ConfigInitialize(s)
+	config.Initialize(s)
 	return nil
 }
 

@@ -21,8 +21,8 @@ import (
 	"github.com/bketelsen/logr"
 	"github.com/corvus-ch/logr/buffered"
 	log "github.com/corvus-ch/logr/logrus"
+	"github.com/saremox/go-icinga2-client/icinga2"
 	"github.com/sirupsen/logrus"
-	"github.com/vshn/go-icinga2-client/icinga2"
 )
 
 type icingaConfig struct {
@@ -67,6 +67,8 @@ type SignaliloConfig struct {
 	DisplayNameAsServiceName bool
 	KeepFor                  time.Duration
 	CAData                   string
+	FilterLabels             bool
+	AllowedLabels            []string
 	StaticServiceVars        map[string]string
 	CustomSeverityLevels     map[string]string
 	MergedSeverityLevels     map[string]int
@@ -77,7 +79,7 @@ type SignaliloConfig struct {
 	Reconnect                time.Duration
 }
 
-func ConfigInitialize(configuration Configuration) {
+func Initialize(configuration Configuration) {
 	l := configuration.GetLogger()
 	config := configuration.GetConfig()
 
@@ -123,7 +125,7 @@ func ConfigInitialize(configuration Configuration) {
 func makeCertPool(c *SignaliloConfig, l logr.Logger) (*x509.CertPool, error) {
 	rootCAs := x509.NewCertPool()
 	if ok := rootCAs.AppendCertsFromPEM([]byte(c.CAData)); !ok {
-		return nil, fmt.Errorf("No certs appended")
+		return nil, fmt.Errorf("no certs appended")
 	}
 	return rootCAs, nil
 }
@@ -276,7 +278,7 @@ func NewMockConfiguration(verbosity int) Configuration {
 	}
 	log := MockLogger(mockCfg.config.LogLevel)
 	mockCfg.logger = log
-	ConfigInitialize(mockCfg)
+	Initialize(mockCfg)
 	// reset logger to the MockLogger, since ConfigInitialize overwrites
 	// the logger.
 	mockCfg.logger = log

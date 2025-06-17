@@ -13,8 +13,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/saremox/signalilo/config"
 	"github.com/stretchr/testify/assert"
-	"github.com/vshn/signalilo/config"
 )
 
 func mockEchoHandler(w http.ResponseWriter, r *http.Request) {

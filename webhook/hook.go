@@ -16,8 +16,8 @@ import (
 	"strings"
 
 	"github.com/prometheus/alertmanager/template"
-	"github.com/vshn/go-icinga2-client/icinga2"
-	"github.com/vshn/signalilo/config"
+	"github.com/saremox/go-icinga2-client/icinga2"
+	"github.com/saremox/signalilo/config"
 )
 
 // responseJSON is used to marshal responses to incoming webhook requests to
@@ -47,16 +47,16 @@ func checkBearerToken(r *http.Request, c config.Configuration) error {
 	if tokenHeader != "" {
 		headerElems := strings.Split(tokenHeader, " ")
 		if len(headerElems) != 2 || (len(headerElems) > 0 && headerElems[0] != "Bearer") {
-			return fmt.Errorf("Malformed authorization header")
+			return fmt.Errorf("malformed authorization header")
 		}
 		token = headerElems[1]
 	} else if tokenQuery != "" {
 		token = tokenQuery
 	} else {
-		return fmt.Errorf("Request dos not contain an authorization token")
+		return fmt.Errorf("request dos not contain an authorization token")
 	}
 	if token != c.GetConfig().AlertManagerConfig.BearerToken {
-		return fmt.Errorf("Invalid bearer token")
+		return fmt.Errorf("invalid bearer token")
 	}
 	return nil
 }
@@ -134,7 +134,7 @@ func Webhook(w http.ResponseWriter, r *http.Request, c config.Configuration) {
 		if err != nil {
 			l.Errorf("Error in checkOrCreateService for %v: %v", serviceName, err)
 		}
-		// If we got an emtpy service object, the service was not
+		// If we got an empty service object, the service was not
 		// created, don't try to call process-check-result
 		if svc.Name == "" {
 			continue
@@ -153,7 +153,7 @@ func Webhook(w http.ResponseWriter, r *http.Request, c config.Configuration) {
 		pluginOutput := ""
 		for _, v := range c.GetConfig().AlertManagerConfig.PluginOutputAnnotations {
 
-			// If the PluginOutputByStates option is enabled then first look for an annotation with the state suffix
+			// If the PluginOutputByStates option is enabled, then first look for an annotation with the state suffix
 			// otherwise fall back to just using the PluginOutputAnnotations value as is
 			if c.GetConfig().AlertManagerConfig.PluginOutputByStates {
 				pluginOutput = alert.Annotations[fmt.Sprintf("%s_%s", v, c.GetConfig().AlertManagerConfig.PluginOutputStateSuffixes[exitStatus])]
