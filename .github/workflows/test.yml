@@ -9,7 +9,7 @@ jobs:
     name: Docker build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: "0"
     - name: Build image
@@ -26,10 +26,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.19', '1.20' ]
+        go: [ '1.23', '1.24' ]
     name: Go install with Go ${{ matrix.go }}
     steps:
-    - uses: actions/setup-go@v4
+    - uses: actions/setup-go@v5
       with:
         go-version: ${{ matrix.go }}
     - run: go install -v github.com/saremox/signalilo@${{ github.head_ref }}
