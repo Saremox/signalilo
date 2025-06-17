@@ -1,40 +1,22 @@
-# Authors:
-# Simon Gerber <simon.gerber@vshn.ch>
-#
-# License:
-# Copyright (c) 2019, VSHN AG, <info@vshn.ch>
-# Licensed under "BSD 3-Clause". See LICENSE file.
+FROM --platform=$BUILDPLATFORM golang:1.24-alpine AS build
+RUN apk --no-cache add \
+  bash
 
-#####################
-# STEP 1 build binary
-#####################
-FROM golang:1.24 AS builder
-
-ARG BINARY_VERSION
-
-# Workdir must be outside of GOPATH because of go mod usage
-WORKDIR /src/signalilo
-
-# Download modules for leveraging docker build cache
-COPY go.mod go.sum ./
-RUN go mod download
-
-# Add code
+WORKDIR /src
 COPY . .
 
-# Run tests and build Signalilo
-RUN make test
-RUN make build
+ARG TARGETOS 
+ARG TARGETARCH 
+ARG VERSION
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH VERSION=$VERSION ./scripts/build.sh
 
-############################
-# STEP 2 build runtime image
-############################
-FROM gcr.io/distroless/static:nonroot
-
-WORKDIR /
-
-COPY --from=builder /src/signalilo/signalilo /usr/local/bin/
-
-EXPOSE 8888
+FROM alpine:latest
+RUN apk --no-cache add \
+  ca-certificates
+COPY --from=build /src/bin/signalilo /usr/local/bin
+RUN addgroup -g 1000 rf && \
+  adduser -D -u 1000 -G rf rf && \
+  chown rf:rf /usr/local/bin/signalilo
+USER rf
 
 ENTRYPOINT ["/usr/local/bin/signalilo"]

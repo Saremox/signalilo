@@ -1,10 +1,11 @@
 # Project parameters
 BINARY_NAME ?= signalilo
 
-BINARY_VERSION = $(shell git describe --tags --always --dirty --match=v* || (echo "command failed $$?"; exit 1))
-VERSION ?= $(BINARY_VERSION)
+VERSION = $(shell git describe --tags --always --dirty --match=v* || (echo "command failed $$?"; exit 1))
 
-IMAGE_NAME ?= ghcr.io/saremox/signalilo:$(VERSION)
+COMMIT=$(shell git rev-parse HEAD)
+REPOSITORY ?= ghcr.io/saremox/signalilo
+TAG ?= $(VERSION)
 
 # Go parameters
 GOCMD   ?= go
@@ -35,5 +36,20 @@ clean:
 
 .PHONY: docker
 docker:
-	docker build --build-arg BINARY_VERSION=$(BINARY_VERSION) -t $(IMAGE_NAME) .
-	@echo built image $(IMAGE_NAME)
+	docker build --build-arg VERSION=$(BINARY_VERSION) -t $(REPOSITORY):$(COMMIT) .
+	@echo built image $(REPOSITORY):$(COMMIT)
+
+.PHONY: image-release
+image-release:
+	docker buildx build \
+	--platform linux/amd64,linux/arm64,linux/arm/v7 \
+	--label "org.opencontainers.image.source=https://github.com/saremox/signalilo" \
+ 	--label "org.opencontainers.image.description=Signalilo push alertmanager alerts to icinga2" \
+ 	--label "org.opencontainers.image.licenses=BSD 3-Clause" \
+	--push \
+	--build-arg VERSION=$(TAG) \
+	-t $(REPOSITORY):latest \
+	-t $(REPOSITORY):$(COMMIT) \
+	-t $(REPOSITORY):$(TAG) \
+	-f Dockerfile \
+	.
