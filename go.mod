@@ -9,7 +9,7 @@ require (
 	github.com/prometheus/alertmanager v0.28.1
 	github.com/saremox/go-icinga2-client v0.0.19
 	github.com/sirupsen/logrus v1.9.3
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 )
 
 require (
