@@ -189,7 +189,7 @@ func newIcingaClient(c *SignaliloConfig, l logging.Logger) (icinga2.Client, erro
 	var client *icinga2.WebClient
 
 	for _, url := range c.IcingaConfig.URL {
-		client, err = icinga2.New(icinga2.WebClient{
+		client, err = icinga2.New(&icinga2.WebClient{
 			URL:               url,
 			Username:          c.IcingaConfig.User,
 			Password:          c.IcingaConfig.Password,
