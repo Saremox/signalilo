@@ -4,6 +4,9 @@ on:
     branches:
     - main
 
+permissions:
+  contents: read
+
 jobs:
   unit_test:
     name: Go vet & test
