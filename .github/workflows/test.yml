@@ -49,7 +49,7 @@ jobs:
     - uses: actions/setup-go@v6
       with:
         go-version: ${{ matrix.go }}
-    - run: go install -v github.com/saremox/signalilo@${{ github.head_ref }}
+    - run: go install -v github.com/saremox/signalilo@${{ github.event.pull_request.head.sha }}
       env:
         GO111MODULE: on
     - run: signalilo --version
