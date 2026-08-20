@@ -1,13 +1,13 @@
 module github.com/saremox/signalilo
 
-go 1.24.3
+go 1.26.0
 
 require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/bketelsen/logr v0.0.0-20170116012416-f3d070bdd1c5
 	github.com/corvus-ch/logr v0.0.0-20210413064445-af2a51d190ad
 	github.com/prometheus/alertmanager v0.28.1
-	github.com/saremox/go-icinga2-client v0.0.19
+	github.com/saremox/go-icinga2-client v0.1.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0
 )
@@ -29,6 +29,5 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.26.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
-	gopkg.in/jmcvetta/napping.v3 v3.2.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
