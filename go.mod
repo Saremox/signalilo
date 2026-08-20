@@ -8,7 +8,7 @@ require (
 	github.com/corvus-ch/logr v0.0.0-20210413064445-af2a51d190ad
 	github.com/prometheus/alertmanager v0.31.1
 	github.com/saremox/go-icinga2-client v0.0.19
-	github.com/sirupsen/logrus v1.9.3
+	github.com/sirupsen/logrus v1.10.0
 	github.com/stretchr/testify v1.11.1
 )
 
