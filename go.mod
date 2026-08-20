@@ -4,8 +4,6 @@ go 1.26.0
 
 require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
-	github.com/bketelsen/logr v0.0.0-20170116012416-f3d070bdd1c5
-	github.com/corvus-ch/logr v0.0.0-20210413064445-af2a51d190ad
 	github.com/prometheus/alertmanager v0.31.1
 	github.com/saremox/go-icinga2-client v0.1.0
 	github.com/sirupsen/logrus v1.10.0
@@ -17,6 +15,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/kr/text v0.1.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.23.2 // indirect

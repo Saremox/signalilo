@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/corvus-ch/logr/buffered"
 	"github.com/saremox/go-icinga2-client/icinga2"
+	"github.com/saremox/signalilo/logging/buffered"
 	"github.com/stretchr/testify/assert"
 )
 
