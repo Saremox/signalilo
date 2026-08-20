@@ -98,63 +98,71 @@ func (s *ServeCommand) startHeartbeat() error {
 	go func() {
 		// Send initial heartbeat from goroutine to make server
 		// startup quicker
-		err := s.heartbeat(time.Now())
-		if err != nil {
-			s.logger.Errorf("Unable to send initial heartbeat: %v", err)
-		}
+		s.runHeartbeatCycle(time.Now())
 
 		for ts := range s.heartbeatTicker.C {
-			if err := s.heartbeat(ts); err != nil {
-				s.logger.Errorf("sending heartbeat: %s", err)
-
-				// In some rare cases there could be an Icinga2 reload for a config update and the API is not reachable.
-				// So, the switch off of the Config-Master would take in place, but we don't want an unnecessary switch
-				// to the secondary Icinga2 instance.
-				if s.config.Reconnect > 0 {
-					s.logger.Infof("Waiting %s for reconnect", s.config.Reconnect)
-					time.Sleep(s.config.Reconnect)
-				}
-
-				erro := s.icingaClient.TestIcingaApi()
-
-				if erro != nil {
-					// Tests all configured '--icinga_url' and sets the URL which doesn't respond with error
-					for _, url := range s.config.IcingaConfig.URL {
-						s.icingaClient.SetIcingaUrl(url)
-						erri := s.icingaClient.TestIcingaApi()
-
-						if erri == nil {
-							s.logger.Infof("Switching to new Icinga-API-URL: %v", url)
-							break
-						} else {
-							continue
-						}
-					}
-				} else {
-					s.logger.Infof("Reconnect successful: %v", s.icingaClient.GetClientConfig().URL)
-					continue
-				}
-			}
-
-			if s.icingaClient.GetClientConfig().URL != s.config.IcingaConfig.URL[0] {
-				// If the first URL is accessible, switch to the 'first one', it's the Icinga-Config-Master per default
-				oldUrl := s.icingaClient.GetClientConfig().URL
-
-				s.icingaClient.SetIcingaUrl(s.config.IcingaConfig.URL[0])
-
-				erro := s.icingaClient.TestIcingaApi()
-
-				if erro != nil {
-					s.icingaClient.SetIcingaUrl(oldUrl)
-					continue
-				} else {
-					s.logger.Infof("Connecting to Icinga-Config-Master: %v", s.config.IcingaConfig.URL[0])
-					continue
-				}
-			}
+			s.runHeartbeatCycle(ts)
 		}
 	}()
 	return nil
+}
+
+// runHeartbeatCycle runs a single heartbeat cycle, recovering from any
+// panic so that an unexpected failure (e.g. in the Icinga client) doesn't
+// take down the whole process.
+func (s *ServeCommand) runHeartbeatCycle(ts time.Time) {
+	defer func() {
+		if r := recover(); r != nil {
+			s.logger.Errorf("recovered from panic in heartbeat cycle: %v", r)
+		}
+	}()
+
+	if err := s.heartbeat(ts); err != nil {
+		s.logger.Errorf("sending heartbeat: %s", err)
+
+		// In some rare cases there could be an Icinga2 reload for a config update and the API is not reachable.
+		// So, the switch off of the Config-Master would take in place, but we don't want an unnecessary switch
+		// to the secondary Icinga2 instance.
+		if s.config.Reconnect > 0 {
+			s.logger.Infof("Waiting %s for reconnect", s.config.Reconnect)
+			time.Sleep(s.config.Reconnect)
+		}
+
+		erro := s.icingaClient.TestIcingaApi()
+
+		if erro != nil {
+			// Tests all configured '--icinga_url' and sets the URL which doesn't respond with error
+			for _, url := range s.config.IcingaConfig.URL {
+				s.icingaClient.SetIcingaUrl(url)
+				erri := s.icingaClient.TestIcingaApi()
+
+				if erri == nil {
+					s.logger.Infof("Switching to new Icinga-API-URL: %v", url)
+					break
+				} else {
+					continue
+				}
+			}
+		} else {
+			s.logger.Infof("Reconnect successful: %v", s.icingaClient.GetClientConfig().URL)
+			return
+		}
+	}
+
+	if s.icingaClient.GetClientConfig().URL != s.config.IcingaConfig.URL[0] {
+		// If the first URL is accessible, switch to the 'first one', it's the Icinga-Config-Master per default
+		oldUrl := s.icingaClient.GetClientConfig().URL
+
+		s.icingaClient.SetIcingaUrl(s.config.IcingaConfig.URL[0])
+
+		erro := s.icingaClient.TestIcingaApi()
+
+		if erro != nil {
+			s.icingaClient.SetIcingaUrl(oldUrl)
+		} else {
+			s.logger.Infof("Connecting to Icinga-Config-Master: %v", s.config.IcingaConfig.URL[0])
+		}
+	}
 }
 
 func (s *ServeCommand) startServiceGC() error {
@@ -163,12 +171,24 @@ func (s *ServeCommand) startServiceGC() error {
 	s.logger.Infof("Starting service garbage collector: interval %v", gcInterval)
 	go func() {
 		for ts := range s.gcTicker.C {
-			if err := gc.Collect(ts, s); err != nil {
-				s.logger.Error(err)
-			}
+			s.runGCCycle(ts)
 		}
 	}()
 	return nil
+}
+
+// runGCCycle runs a single garbage-collection cycle, recovering from any
+// panic so that an unexpected failure doesn't take down the whole process.
+func (s *ServeCommand) runGCCycle(ts time.Time) {
+	defer func() {
+		if r := recover(); r != nil {
+			s.logger.Errorf("recovered from panic in garbage collection cycle: %v", r)
+		}
+	}()
+
+	if err := gc.Collect(ts, s); err != nil {
+		s.logger.Error(err)
+	}
 }
 
 func (s *ServeCommand) run(ctx *kingpin.ParseContext) error {
@@ -201,8 +221,7 @@ func (s *ServeCommand) run(ctx *kingpin.ParseContext) error {
 
 func (s *ServeCommand) initialize(ctx *kingpin.ParseContext) error {
 	s.logger = config.NewLogger(s.logLevel)
-	config.Initialize(s)
-	return nil
+	return config.Initialize(s)
 }
 
 func configureServeCommand(app *kingpin.Application) {

@@ -79,7 +79,12 @@ type SignaliloConfig struct {
 	Reconnect                time.Duration
 }
 
-func Initialize(configuration Configuration) {
+// Initialize sets up the logger, Icinga client and derived configuration on
+// configuration. It returns an error if the Icinga client could not be
+// created; callers that require a working Icinga connection (i.e. the real
+// serve command) should treat that as fatal instead of continuing to run
+// with a nil Icinga client.
+func Initialize(configuration Configuration) error {
 	l := configuration.GetLogger()
 	config := configuration.GetConfig()
 
@@ -89,9 +94,9 @@ func Initialize(configuration Configuration) {
 	// Refresh local reference to logger after setup
 	l = configuration.GetLogger()
 
-	icinga, err := newIcingaClient(config, l)
-	if err != nil {
-		l.Errorf("Unable to create new icinga client: %s", err)
+	icinga, icingaErr := newIcingaClient(config, l)
+	if icingaErr != nil {
+		l.Errorf("Unable to create new icinga client: %s", icingaErr)
 	} else {
 		configuration.SetIcingaClient(icinga)
 	}
@@ -120,6 +125,10 @@ func Initialize(configuration Configuration) {
 	// Set the suffixes used for the PluginOutputByStates
 	config.AlertManagerConfig.PluginOutputStateSuffixes = []string{"ok", "warning", "critical", "unknown"}
 
+	if icingaErr != nil {
+		return fmt.Errorf("unable to create new icinga client: %w", icingaErr)
+	}
+	return nil
 }
 
 func makeCertPool(c *SignaliloConfig, l logging.Logger) (*x509.CertPool, error) {
@@ -278,7 +287,10 @@ func NewMockConfiguration(verbosity int) Configuration {
 	}
 	log := MockLogger(mockCfg.config.LogLevel)
 	mockCfg.logger = log
-	Initialize(mockCfg)
+	// The mock configuration intentionally points at unreachable Icinga
+	// URLs, so an Icinga-client error here is expected; callers of this
+	// mock don't rely on a working Icinga client.
+	_ = Initialize(mockCfg)
 	// reset logger to the MockLogger, since ConfigInitialize overwrites
 	// the logger.
 	mockCfg.logger = log
