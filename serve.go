@@ -15,10 +15,10 @@ import (
 	"time"
 
 	"github.com/alecthomas/kingpin/v2"
-	"github.com/bketelsen/logr"
 	"github.com/saremox/go-icinga2-client/icinga2"
 	"github.com/saremox/signalilo/config"
 	"github.com/saremox/signalilo/gc"
+	"github.com/saremox/signalilo/logging"
 	"github.com/saremox/signalilo/webhook"
 )
 
@@ -28,7 +28,7 @@ type ServeCommand struct {
 	port            int
 	logLevel        int
 	config          config.SignaliloConfig
-	logger          logr.Logger
+	logger          logging.Logger
 	icingaClient    icinga2.Client
 	heartbeatTicker *time.Ticker
 	gcTicker        *time.Ticker
@@ -40,7 +40,7 @@ func (s *ServeCommand) GetConfig() *config.SignaliloConfig {
 }
 
 // GetLogger implements config.Configuration
-func (s *ServeCommand) GetLogger() logr.Logger {
+func (s *ServeCommand) GetLogger() logging.Logger {
 	return s.logger
 }
 
@@ -50,7 +50,7 @@ func (s *ServeCommand) GetIcingaClient() icinga2.Client {
 }
 
 // SetLogger implements config.Configuration
-func (s *ServeCommand) SetLogger(logger logr.Logger) {
+func (s *ServeCommand) SetLogger(logger logging.Logger) {
 	s.logger = logger
 }
 

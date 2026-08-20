@@ -18,10 +18,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bketelsen/logr"
-	"github.com/corvus-ch/logr/buffered"
-	log "github.com/corvus-ch/logr/logrus"
 	"github.com/saremox/go-icinga2-client/icinga2"
+	"github.com/saremox/signalilo/logging"
+	"github.com/saremox/signalilo/logging/buffered"
+	log "github.com/saremox/signalilo/logging/logrus"
 	"github.com/sirupsen/logrus"
 )
 
@@ -39,8 +39,8 @@ type icingaConfig struct {
 type Configuration interface {
 	GetConfig() *SignaliloConfig
 
-	GetLogger() logr.Logger
-	SetLogger(logger logr.Logger)
+	GetLogger() logging.Logger
+	SetLogger(logger logging.Logger)
 
 	GetIcingaClient() icinga2.Client
 	SetIcingaClient(icinga icinga2.Client)
@@ -122,7 +122,7 @@ func Initialize(configuration Configuration) {
 
 }
 
-func makeCertPool(c *SignaliloConfig, l logr.Logger) (*x509.CertPool, error) {
+func makeCertPool(c *SignaliloConfig, l logging.Logger) (*x509.CertPool, error) {
 	rootCAs := x509.NewCertPool()
 	if ok := rootCAs.AppendCertsFromPEM([]byte(c.CAData)); !ok {
 		return nil, fmt.Errorf("no certs appended")
@@ -130,7 +130,7 @@ func makeCertPool(c *SignaliloConfig, l logr.Logger) (*x509.CertPool, error) {
 	return rootCAs, nil
 }
 
-func newIcingaClient(c *SignaliloConfig, l logr.Logger) (icinga2.Client, error) {
+func newIcingaClient(c *SignaliloConfig, l logging.Logger) (icinga2.Client, error) {
 	rootCAs, err := x509.SystemCertPool()
 	if err != nil && c.CAData == "" {
 		return nil, fmt.Errorf("could not load system rootCA and no CA provided: %w", err)
@@ -204,7 +204,7 @@ func newIcingaClient(c *SignaliloConfig, l logr.Logger) (icinga2.Client, error) 
 	return client, nil
 }
 
-func NewLogger(verbosity int) logr.Logger {
+func NewLogger(verbosity int) logging.Logger {
 	jf := new(logrus.JSONFormatter)
 	ll := &logrus.Logger{
 		Out:       os.Stdout,
@@ -215,20 +215,20 @@ func NewLogger(verbosity int) logr.Logger {
 	return log.New(verbosity, ll)
 }
 
-func MockLogger(verbosity int) logr.Logger {
+func MockLogger(verbosity int) logging.Logger {
 	return buffered.New(verbosity)
 }
 
 type MockConfiguration struct {
 	config       SignaliloConfig
-	logger       logr.Logger
+	logger       logging.Logger
 	icingaClient icinga2.Client
 }
 
 func (c *MockConfiguration) GetConfig() *SignaliloConfig {
 	return &c.config
 }
-func (c *MockConfiguration) GetLogger() logr.Logger {
+func (c *MockConfiguration) GetLogger() logging.Logger {
 	return c.logger
 }
 func (c *MockConfiguration) GetIcingaClient() icinga2.Client {
@@ -237,7 +237,7 @@ func (c *MockConfiguration) GetIcingaClient() icinga2.Client {
 func (c *MockConfiguration) SetConfig(config SignaliloConfig) {
 	c.config = config
 }
-func (c *MockConfiguration) SetLogger(logger logr.Logger) {
+func (c *MockConfiguration) SetLogger(logger logging.Logger) {
 	c.logger = logger
 }
 func (c *MockConfiguration) SetIcingaClient(icinga icinga2.Client) {

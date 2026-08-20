@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/bketelsen/logr"
 	"github.com/saremox/go-icinga2-client/icinga2"
+	"github.com/saremox/signalilo/logging"
 )
 
 // Error messages
@@ -19,7 +19,7 @@ var (
 	mappingKeyPattern = regexp.MustCompile("^icinga_([a-z]+)_(.*)$")
 )
 
-func mapIcingaVariables(vars icinga2.Vars, kv map[string]string, prefix string, log logr.Logger) icinga2.Vars {
+func mapIcingaVariables(vars icinga2.Vars, kv map[string]string, prefix string, log logging.Logger) icinga2.Vars {
 	for k, v := range kv {
 		vars[prefix+k] = v
 
@@ -60,7 +60,7 @@ func mapIcingaVariable(key, value string) (string, interface{}, error) {
 	return "", nil, ErrorUnknownMappingType
 }
 
-func addStaticIcingaVariables(vars icinga2.Vars, staticVars map[string]string, log logr.Logger) icinga2.Vars {
+func addStaticIcingaVariables(vars icinga2.Vars, staticVars map[string]string, log logging.Logger) icinga2.Vars {
 	for k, v := range staticVars {
 		// Only add a static variable if it's not already set on the
 		// service.
