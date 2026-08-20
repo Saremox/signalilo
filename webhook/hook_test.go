@@ -11,8 +11,11 @@ package webhook
 
 import (
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
+	"github.com/saremox/go-icinga2-client/icinga2"
 	"github.com/saremox/signalilo/config"
 	"github.com/stretchr/testify/assert"
 )
@@ -50,4 +53,22 @@ func TestBearerTokenMissing(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "https://example.com/webhook", nil)
 	err := checkBearerToken(req, conf)
 	assert.Error(t, err)
+}
+
+// TestWebhookBodyTooLarge is a regression test ensuring an oversized
+// request body is rejected instead of being read in full, which could
+// otherwise let a slow or huge request tie up a handler goroutine or
+// exhaust memory.
+func TestWebhookBodyTooLarge(t *testing.T) {
+	conf := config.NewMockConfiguration(1)
+	conf.SetIcingaClient(icinga2.NewMockClient())
+
+	oversized := strings.NewReader(strings.Repeat("a", maxWebhookBodyBytes+1))
+	req := httptest.NewRequest(http.MethodPost,
+		"https://example.com/webhook?token="+conf.GetConfig().AlertManagerConfig.BearerToken, oversized)
+	rec := httptest.NewRecorder()
+
+	Webhook(rec, req, conf)
+
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }

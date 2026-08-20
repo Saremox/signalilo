@@ -10,8 +10,12 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"net/http"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/alecthomas/kingpin/v2"
@@ -20,6 +24,24 @@ import (
 	"github.com/saremox/signalilo/gc"
 	"github.com/saremox/signalilo/logging"
 	"github.com/saremox/signalilo/webhook"
+)
+
+const (
+	// httpReadHeaderTimeout bounds how long the server waits to read a
+	// request's headers, to protect against slow-client/slowloris style
+	// connections tying up handler goroutines indefinitely.
+	httpReadHeaderTimeout = 10 * time.Second
+	// httpReadTimeout bounds how long the server waits to read a full
+	// request, including the body.
+	httpReadTimeout = 30 * time.Second
+	// httpWriteTimeout bounds how long the server takes to write a
+	// response.
+	httpWriteTimeout = 30 * time.Second
+	// httpIdleTimeout bounds how long a keep-alive connection may sit idle.
+	httpIdleTimeout = 120 * time.Second
+	// shutdownTimeout bounds how long graceful shutdown waits for
+	// in-flight requests to finish before giving up.
+	shutdownTimeout = 10 * time.Second
 )
 
 // ServeCommand holds all the configuration and objects necessary to serve the
@@ -192,9 +214,10 @@ func (s *ServeCommand) runGCCycle(ts time.Time) {
 }
 
 func (s *ServeCommand) run(ctx *kingpin.ParseContext) error {
-	http.HandleFunc("/healthz",
+	mux := http.NewServeMux()
+	mux.HandleFunc("/healthz",
 		func(w http.ResponseWriter, r *http.Request) { healthz(w, r, s) })
-	http.HandleFunc("/webhook",
+	mux.HandleFunc("/webhook",
 		func(w http.ResponseWriter, r *http.Request) { webhook.Webhook(w, r, s) })
 
 	s.logger.Infof("Signalilo UUID: %v", s.GetConfig().UUID)
@@ -209,14 +232,47 @@ func (s *ServeCommand) run(ctx *kingpin.ParseContext) error {
 	}
 
 	listenAddress := fmt.Sprintf(":%d", s.port)
-	s.logger.Infof("listening on: %v", listenAddress)
-	alertManagerConfig := s.config.AlertManagerConfig
-	if alertManagerConfig.UseTLS {
-		s.logger.Infof("Using TLS: certificate=%v, key=%v", alertManagerConfig.TLSCertPath, alertManagerConfig.TLSKeyPath)
-		return http.ListenAndServeTLS(listenAddress, alertManagerConfig.TLSCertPath, alertManagerConfig.TLSKeyPath, nil)
+	srv := &http.Server{
+		Addr:              listenAddress,
+		Handler:           mux,
+		ReadHeaderTimeout: httpReadHeaderTimeout,
+		ReadTimeout:       httpReadTimeout,
+		WriteTimeout:      httpWriteTimeout,
+		IdleTimeout:       httpIdleTimeout,
 	}
 
-	return http.ListenAndServe(listenAddress, nil)
+	sigCtx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	go func() {
+		<-sigCtx.Done()
+		s.logger.Infof("Received shutdown signal, shutting down gracefully")
+
+		s.heartbeatTicker.Stop()
+		s.gcTicker.Stop()
+
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+		defer cancel()
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			s.logger.Errorf("Error during graceful shutdown: %v", err)
+		}
+	}()
+
+	s.logger.Infof("listening on: %v", listenAddress)
+	alertManagerConfig := s.config.AlertManagerConfig
+
+	var err error
+	if alertManagerConfig.UseTLS {
+		s.logger.Infof("Using TLS: certificate=%v, key=%v", alertManagerConfig.TLSCertPath, alertManagerConfig.TLSKeyPath)
+		err = srv.ListenAndServeTLS(alertManagerConfig.TLSCertPath, alertManagerConfig.TLSKeyPath)
+	} else {
+		err = srv.ListenAndServe()
+	}
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+	s.logger.Infof("Server stopped")
+	return nil
 }
 
 func (s *ServeCommand) initialize(ctx *kingpin.ParseContext) error {
