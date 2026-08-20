@@ -52,5 +52,4 @@ jobs:
     - run: go install -v github.com/saremox/signalilo@${{ github.head_ref }}
       env:
         GO111MODULE: on
-        GOPROXY: direct
     - run: signalilo --version
