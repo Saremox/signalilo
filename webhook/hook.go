@@ -20,6 +20,11 @@ import (
 	"github.com/saremox/signalilo/config"
 )
 
+// maxWebhookBodyBytes bounds how large an incoming webhook request body may
+// be, so a slow or oversized request can't tie up a handler goroutine or
+// exhaust memory decoding it.
+const maxWebhookBodyBytes = 5 * 1024 * 1024 // 5 MiB
+
 // responseJSON is used to marshal responses to incoming webhook requests to
 // JSON
 type responseJSON struct {
@@ -64,6 +69,7 @@ func checkBearerToken(r *http.Request, c config.Configuration) error {
 // Webhook handles incoming webhook HTTP requests
 func Webhook(w http.ResponseWriter, r *http.Request, c config.Configuration) {
 	defer r.Body.Close()
+	r.Body = http.MaxBytesReader(w, r.Body, maxWebhookBodyBytes)
 
 	l := c.GetLogger()
 	if l == nil {
