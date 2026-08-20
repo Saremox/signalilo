@@ -44,8 +44,12 @@ func collectService(svc icinga2.Service, c config.Configuration, downtimes []ici
 		return nil
 	}
 
-	keepForNs := int64(svc.Vars["keep_for"].(float64))
-	keepFor := time.Duration(keepForNs)
+	keepForVar, ok := svc.Vars["keep_for"].(float64)
+	if !ok {
+		l.Errorf("[Collect] Service %v has missing or invalid 'keep_for' var (%v); skipping", svc.Name, svc.Vars["keep_for"])
+		return nil
+	}
+	keepFor := time.Duration(int64(keepForVar))
 	lastChangeUnixNs := int64(svc.LastStateChange * 1e9)
 	lastChange := time.Unix(0, lastChangeUnixNs)
 	serviceAge := time.Since(lastChange)
