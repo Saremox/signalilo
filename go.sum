@@ -32,8 +32,8 @@ github.com/prometheus/procfs v0.16.1 h1:hZ15bTNuirocR6u0JZ6BAHHmwS1p8B4P6MRqxtzM
 github.com/prometheus/procfs v0.16.1/go.mod h1:teAbpZRB1iIAJYREa1LsoWUXykVXA1KlTmWl8x/U+Is=
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/rogpeppe/go-internal v1.10.0/go.mod h1:UQnix2H7Ngw/k4C5ijL5+65zddjncjaFoBhdsK/akog=
-github.com/saremox/go-icinga2-client v0.1.0 h1:UurxaUAX2W/cAqzehsLKWAtLD0o7nWmlIXZVjN8IDZM=
-github.com/saremox/go-icinga2-client v0.1.0/go.mod h1:wi3iMWC3DoNFhCJ9y8mDKAEHCavd7EIV5qcawRLHHIU=
+github.com/saremox/go-icinga2-client v0.2.0 h1:Py7huxedh8So0GbfTEzeSFk3Usbr97FofC+nnaVXAjI=
+github.com/saremox/go-icinga2-client v0.2.0/go.mod h1:wi3iMWC3DoNFhCJ9y8mDKAEHCavd7EIV5qcawRLHHIU=
 github.com/shurcooL/httpfs v0.0.0-20230704072500-f1e31cf0ba5c h1:aqg5Vm5dwtvL+YgDpBcK1ITf3o96N/K7/wsRXQnUTEs=
 github.com/shurcooL/httpfs v0.0.0-20230704072500-f1e31cf0ba5c/go.mod h1:owqhoLW1qZoYLZzLnBw+QkPP9WZnjlSWihhxAJC1+/M=
 github.com/shurcooL/vfsgen v0.0.0-20230704071429-0000e147ea92 h1:OfRzdxCzDhp+rsKWXuOO2I/quKMJ/+TQwVbIP/gltZg=
