@@ -19,7 +19,7 @@ type logger struct {
 	logger    *logrus.Logger
 }
 
-func (l *logger) Info(args ...interface{}) {
+func (l *logger) Info(args ...any) {
 	if l.Enabled() {
 		if l.level > 0 {
 			l.logger.Debug(args...)
@@ -29,7 +29,7 @@ func (l *logger) Info(args ...interface{}) {
 	}
 }
 
-func (l *logger) Infof(format string, args ...interface{}) {
+func (l *logger) Infof(format string, args ...any) {
 	if l.Enabled() {
 		if l.level > 0 {
 			l.logger.Debugf(format, args...)
@@ -43,11 +43,11 @@ func (l *logger) Enabled() bool {
 	return l.level <= l.verbosity
 }
 
-func (l *logger) Error(args ...interface{}) {
+func (l *logger) Error(args ...any) {
 	l.logger.Error(args...)
 }
 
-func (l *logger) Errorf(format string, args ...interface{}) {
+func (l *logger) Errorf(format string, args ...any) {
 	l.logger.Errorf(format, args...)
 }
 

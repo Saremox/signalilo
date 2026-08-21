@@ -78,7 +78,7 @@ func computeServiceName(
 }
 
 // computeDisplayName computes a "human-readable" display name for Icinga2
-func computeDisplayName(data template.Data, alert template.Alert) (string, error) {
+func computeDisplayName(alert template.Alert) (string, error) {
 	return alert.Labels["alertname"], nil
 }
 
@@ -109,35 +109,35 @@ func createServiceData(hostname string,
 	heartbeatInterval time.Duration,
 	c config.Configuration) icinga2.Service {
 	l := c.GetLogger()
-	config := c.GetConfig()
+	cfg := c.GetConfig()
 
 	// build Vars map
 	serviceVars := make(icinga2.Vars)
 	// Set defaults
-	serviceVars["bridge_uuid"] = config.UUID
-	serviceVars["keep_for"] = config.KeepFor
+	serviceVars["bridge_uuid"] = cfg.UUID
+	serviceVars["keep_for"] = cfg.KeepFor
 	serviceVars = mapIcingaVariables(serviceVars, alert.Labels, "label_", l)
 	serviceVars = mapIcingaVariables(serviceVars, alert.Annotations, "annotation_", l)
-	serviceVars = addStaticIcingaVariables(serviceVars, config.StaticServiceVars, l)
+	serviceVars = addStaticIcingaVariables(serviceVars, cfg.StaticServiceVars, l)
 
 	// Create service attrs object
 	serviceData := icinga2.Service{
 		Name:               serviceName,
 		DisplayName:        displayName,
 		HostName:           hostname,
-		CheckCommand:       config.CheckCommand,
-		EnableActiveChecks: config.ActiveChecks,
+		CheckCommand:       cfg.CheckCommand,
+		EnableActiveChecks: cfg.ActiveChecks,
 		Notes:              alert.Annotations["description"],
 		Vars:               serviceVars,
 		ActionURL:          alert.GeneratorURL,
 		NotesURL:           alert.Annotations["runbook_url"],
-		CheckInterval:      config.ChecksInterval.Seconds(),
-		RetryInterval:      config.ChecksInterval.Seconds(),
+		CheckInterval:      cfg.ChecksInterval.Seconds(),
+		RetryInterval:      cfg.ChecksInterval.Seconds(),
 		// We don't usually need soft states in Icinga, since the grace
 		// periods are already managed by Prometheus/Alertmanager and relevant
 		// config parameter defaults to 1, but is still tunable for other usecases
-		MaxCheckAttempts: float64(config.MaxCheckAttempts),
-		Templates:        config.IcingaConfig.Templates,
+		MaxCheckAttempts: float64(cfg.MaxCheckAttempts),
+		Templates:        cfg.IcingaConfig.Templates,
 	}
 
 	// Check if this is a heartbeat service. Adjust serviceData
@@ -190,7 +190,7 @@ func updateOrCreateService(icinga icinga2.Client,
 	icingaSvc, err := icinga.GetService(serviceData.FullName())
 	// update or create service, depending on whether object exists
 	if err == nil {
-		l.Infof("updating service: %+v\n", icingaSvc.Name)
+		l.Infof("updating service: %v", icingaSvc.Name)
 
 		// Templates needs to be ignored if the service is already created due to the Error:
 		// Attribute 'templates' could not be set: Error: Attribute cannot be modified.
@@ -201,7 +201,7 @@ func updateOrCreateService(icinga icinga2.Client,
 			return serviceData, err
 		}
 	} else if status > 0 {
-		l.Infof("creating service: %+v with templates: %v\n", serviceName, serviceData.Templates)
+		l.Infof("creating service: %v with templates: %v", serviceName, serviceData.Templates)
 
 		err := icinga.CreateService(serviceData)
 		if err != nil {

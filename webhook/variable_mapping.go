@@ -11,7 +11,7 @@ import (
 
 // Error messages
 var (
-	ErrorNotAMappingKey     = errors.New("key does meet the mappable pattern")
+	ErrorNotAMappingKey     = errors.New("key does not meet the mappable pattern")
 	ErrorUnknownMappingType = errors.New("unknown type")
 )
 
@@ -37,7 +37,7 @@ func mapIcingaVariables(vars icinga2.Vars, kv map[string]string, prefix string, 
 	return vars
 }
 
-func mapIcingaVariable(key, value string) (string, interface{}, error) {
+func mapIcingaVariable(key, value string) (string, any, error) {
 	matches := mappingKeyPattern.FindStringSubmatch(key)
 	if len(matches) < 3 {
 		return key, value, ErrorNotAMappingKey

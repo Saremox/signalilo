@@ -7,10 +7,10 @@ package logging
 // level.
 type InfoLogger interface {
 	// Info logs a non-error message.
-	Info(args ...interface{})
+	Info(args ...any)
 
 	// Infof logs a formatted non-error message.
-	Infof(format string, args ...interface{})
+	Infof(format string, args ...any)
 
 	// Enabled reports whether this InfoLogger is enabled at its level.
 	Enabled() bool
@@ -21,10 +21,10 @@ type Logger interface {
 	InfoLogger
 
 	// Error logs an error message.
-	Error(args ...interface{})
+	Error(args ...any)
 
 	// Errorf logs a formatted error message.
-	Errorf(format string, args ...interface{})
+	Errorf(format string, args ...any)
 
 	// V returns an InfoLogger for the given verbosity level. Higher levels
 	// are less important and are silenced once they exceed the logger's

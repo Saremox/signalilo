@@ -150,7 +150,7 @@ func TestUpdateOrCreateRegularService(t *testing.T) {
 			alert := tcase.alert
 			svcName, err := computeServiceName(template.Data{}, alert, c)
 			assert.NoError(t, err)
-			displayName, err := computeDisplayName(template.Data{}, alert)
+			displayName, err := computeDisplayName(alert)
 			assert.NoError(t, err)
 			svc, err := updateOrCreateService(i, "test.vshn.net", svcName, displayName, alert, c)
 			assert.NoError(t, err, fmt.Sprintf("Alert: %+v -> %v; err = %v", alert, svc, err))
@@ -170,7 +170,7 @@ func TestUpdateOrCreateHeartbeatService(t *testing.T) {
 			alert := tcase.alert
 			svcName, err := computeServiceName(template.Data{}, alert, c)
 			assert.NoError(t, err)
-			displayName, err := computeDisplayName(template.Data{}, alert)
+			displayName, err := computeDisplayName(alert)
 			assert.NoError(t, err)
 			svc, err := updateOrCreateService(i, "test.vshn.net", svcName, displayName, alert, c)
 			assert.NoError(t, err, "service creation successful")
@@ -192,7 +192,7 @@ func TestUpdateOrCreateHeartbeatService(t *testing.T) {
 			alert := tcase.alert
 			svcName, err := computeServiceName(template.Data{}, alert, c)
 			assert.NoError(t, err)
-			displayName, err := computeDisplayName(template.Data{}, alert)
+			displayName, err := computeDisplayName(alert)
 			assert.NoError(t, err)
 			svc, err := updateOrCreateService(i, "test.vshn.net", svcName, displayName, alert, c)
 			assert.NoError(t, err, "service creation successful")

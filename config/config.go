@@ -67,8 +67,6 @@ type SignaliloConfig struct {
 	DisplayNameAsServiceName bool
 	KeepFor                  time.Duration
 	CAData                   string
-	FilterLabels             bool
-	AllowedLabels            []string
 	StaticServiceVars        map[string]string
 	CustomSeverityLevels     map[string]string
 	MergedSeverityLevels     map[string]int
@@ -242,9 +240,6 @@ func (c *MockConfiguration) GetLogger() logging.Logger {
 }
 func (c *MockConfiguration) GetIcingaClient() icinga2.Client {
 	return c.icingaClient
-}
-func (c *MockConfiguration) SetConfig(config SignaliloConfig) {
-	c.config = config
 }
 func (c *MockConfiguration) SetLogger(logger logging.Logger) {
 	c.logger = logger

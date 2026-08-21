@@ -14,7 +14,7 @@ var mapIcingaVariableTest = map[string]struct {
 	iK  string
 	iV  string
 	oK  string
-	oV  interface{}
+	oV  any
 	err error
 }{
 	"not mapped":    {"foo", "bar", "foo", "bar", ErrorNotAMappingKey},
