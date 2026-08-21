@@ -1,0 +1,111 @@
+# Default values for signalilo.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- This chart is compatible with the values.yaml of the old
+# appuio/charts signalilo chart (https://github.com/appuio/charts/tree/master/appuio/signalilo).
+# Migrating from that chart to this one should not require any changes to
+# an existing values file, beyond the image repository having moved from
+# docker.io/vshn/signalilo to ghcr.io/saremox/signalilo.
+
+replicaCount: 1
+
+image:
+  registry: ghcr.io
+  repository: saremox/signalilo
+  tag: v0.15.0
+  pullPolicy: IfNotPresent
+  # username:
+  # password:
+  # existingPullSecret: my-image-pull-secret
+
+nameOverride: ""
+fullnameOverride: ""
+
+# Required configuration
+config:
+  # uuid: 9ec06d59-aa0c-4434-b5e2-1aeaf93cd925
+  # icinga_hostname: localhost
+  # icinga_url: https://localhost:5665
+  # icinga_username: icinga_user
+  # icinga_password: icinga_user_pw
+  # icinga_password_secret:
+  alertmanager_port: 8888
+  # alertmanager_bearer_token: aaaaaa
+  # alertmanager_bearer_token_secret:
+
+# Optional extra configuration
+# extraEnvVars:
+# - name: SIGNALILO_LOG_LEVEL
+#   value: "2"
+# - name: SIGNALILO_ICINGA_CA
+#   value: |
+#     -----BEGIN CERTIFICATE-----
+#     ....
+#     -----END CERTIFICATE-----
+# - name: SIGNALILO_ICINGA_INSECURE_TLS
+#   value: "false"
+# - name: SIGNALILO_ICINGA_DEBUG
+#   value: "false"
+# - name: SIGNALILO_ICINGA_GC_INTERVAL
+#   value: "15m"
+# - name: SIGNALILO_ICINGA_HEARTBEAT_INTERVAL
+#   value: "60s"
+# - name: SIGNALILO_ICINGA_KEEP_FOR
+#   value: "168h"
+# - name: SIGNALILO_ICINGA_SERVICE_TEMPLATE
+#   value: "go-icinga2-service"
+# - name: SIGNALILO_ICINGA_RECONNECT
+#   value: "0"
+#
+# Extra volumes for the Signalilo deployment. Optional.
+extraVolumes: []
+
+# Extra volumeMounts for the Signalilo deployment. Optional.
+extraVolumeMounts: []
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  # Annotations to add to the service account
+  annotations: {}
+
+securityContext:
+  enabled: false
+  runAsUser: 999
+  fsGroup: 999
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+# It is recommended to only use Signalilo inside the same cluster/network as the alertmanager instance sending the alerts.
+# Running Signalilo on a different network as the connected alertmanager is untested.
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: signalilo.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: signalilo-tls
+  #    hosts:
+  #      - signalilo.local
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
