@@ -36,7 +36,7 @@ clean:
 
 .PHONY: docker
 docker:
-	docker build --build-arg VERSION=$(BINARY_VERSION) -t $(REPOSITORY):$(COMMIT) .
+	docker build --build-arg VERSION=$(VERSION) -t $(REPOSITORY):$(COMMIT) .
 	@echo built image $(REPOSITORY):$(COMMIT)
 
 .PHONY: image-release

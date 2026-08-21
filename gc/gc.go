@@ -36,11 +36,11 @@ func collectService(svc icinga2.Service, c config.Configuration, downtimes []ici
 	_, heartbeat := svc.Vars["label_heartbeat"]
 	_, downtimed := extractDowntime(downtimes, svc.Name)
 	if heartbeat && !downtimed {
-		l.V(2).Infof(fmt.Sprintf("[Collect] Skipping heartbeat %v: not downtimed", svc.Name))
+		l.V(2).Infof("[Collect] Skipping heartbeat %v: not downtimed", svc.Name)
 		return nil
 	} else if svc.State > 0 && !heartbeat {
-		l.V(2).Infof(fmt.Sprintf("[Collect] Skipping service %v: state=%v, downtimed=%v",
-			svc.Name, svc.State, downtimed))
+		l.V(2).Infof("[Collect] Skipping service %v: state=%v, downtimed=%v",
+			svc.Name, svc.State, downtimed)
 		return nil
 	}
 
@@ -57,7 +57,7 @@ func collectService(svc icinga2.Service, c config.Configuration, downtimes []ici
 		l.V(2).Infof("[Collect] Deleting service %v: keep_for = %v; age = %v", svc.Name, keepFor, serviceAge)
 		err := icinga.DeleteService(svc.FullName())
 		if err != nil {
-			l.Errorf(fmt.Sprintf("Error while deleting service: %v", err))
+			l.Errorf("Error while deleting service: %v", err)
 		}
 	} else {
 		l.V(2).Infof("[Collect] Skipping service %v: keep_for = %v; age = %v", svc.Name, keepFor, serviceAge)
@@ -77,7 +77,7 @@ func Collect(ts time.Time, c config.Configuration) error {
 		Filter: fmt.Sprintf(`match("%v", service.host_name)`, hostname),
 	})
 	if err != nil {
-		l.Errorf(fmt.Sprintf("[Collect] Error while listing services: %v", err))
+		l.Errorf("[Collect] Error while listing services: %v", err)
 		return err
 	}
 	l.V(2).Infof("[Collect] Found %v services with host = %v", len(services), hostname)
@@ -85,7 +85,7 @@ func Collect(ts time.Time, c config.Configuration) error {
 		Filter: fmt.Sprintf(`match("%v", downtime.host_name)`, hostname),
 	})
 	if err != nil {
-		l.Errorf(fmt.Sprintf("[Collect] Error while listing downtimes: %v", err))
+		l.Errorf("[Collect] Error while listing downtimes: %v", err)
 		return err
 	}
 	l.V(2).Infof("[Collect] Found %v downtimes with host = %v", len(downtimes), hostname)
@@ -97,7 +97,7 @@ func Collect(ts time.Time, c config.Configuration) error {
 			l.Infof("[Collect] Found service %v with our bridge UUID", svc.Name)
 			err = collectService(svc, c, downtimes)
 			if err != nil {
-				l.Errorf(fmt.Sprintf("[Collect] Error garbage-collecting service: %v", err))
+				l.Errorf("[Collect] Error garbage-collecting service: %v", err)
 			}
 		}
 	}

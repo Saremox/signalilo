@@ -38,11 +38,10 @@ func asJSON(w http.ResponseWriter, status int, message string) {
 		Status:  status,
 		Message: message,
 	}
-	bytes, _ := json.Marshal(data)
-	json := string(bytes[:])
+	body, _ := json.Marshal(data)
 
 	w.WriteHeader(status)
-	fmt.Fprint(w, json)
+	fmt.Fprint(w, string(body))
 }
 
 func checkBearerToken(r *http.Request, c config.Configuration) error {
@@ -58,7 +57,7 @@ func checkBearerToken(r *http.Request, c config.Configuration) error {
 	} else if tokenQuery != "" {
 		token = tokenQuery
 	} else {
-		return fmt.Errorf("request dos not contain an authorization token")
+		return fmt.Errorf("request does not contain an authorization token")
 	}
 	if token != c.GetConfig().AlertManagerConfig.BearerToken {
 		return fmt.Errorf("invalid bearer token")
@@ -98,14 +97,13 @@ func Webhook(w http.ResponseWriter, r *http.Request, c config.Configuration) {
 
 	serviceHost := c.GetConfig().HostName
 	l.V(2).Infof("Check service host: %v", serviceHost)
-	host, err := icinga.GetHost(serviceHost)
+	_, err := icinga.GetHost(serviceHost)
 	if err != nil {
-		l.Errorf("Did not find service host %v: %v\n", host, err)
+		l.Errorf("Did not find service host %v: %v", serviceHost, err)
 		asJSON(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	sameAlertName := false
 	groupedAlertName, sameAlertName := data.GroupLabels["alertname"]
 	if sameAlertName {
 		l.V(2).Infof("Grouped alerts with matching alertname: %v", groupedAlertName)
@@ -129,7 +127,7 @@ func Webhook(w http.ResponseWriter, r *http.Request, c config.Configuration) {
 		if c.GetConfig().DisplayNameAsServiceName {
 			displayName = serviceName
 		} else {
-			displayName, err = computeDisplayName(data, alert)
+			displayName, err = computeDisplayName(alert)
 			if err != nil {
 				l.Errorf("Unable to compute service display name: %v", err)
 			}

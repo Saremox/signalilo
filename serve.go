@@ -88,14 +88,14 @@ func healthz(w http.ResponseWriter, r *http.Request, c config.Configuration) {
 
 func (s *ServeCommand) heartbeat(ts time.Time) error {
 	icinga := s.GetIcingaClient()
-	config := s.GetConfig()
+	cfg := s.GetConfig()
 	l := s.GetLogger()
-	_, err := icinga.GetHost(config.HostName)
+	_, err := icinga.GetHost(cfg.HostName)
 	if err != nil {
 		l.Errorf("heartbeat: unable to get servicehost: %v", err)
 		return err
 	}
-	svc, err := icinga.GetService(fmt.Sprintf("%v!heartbeat", config.HostName))
+	svc, err := icinga.GetService(fmt.Sprintf("%v!heartbeat", cfg.HostName))
 	if err != nil {
 		l.Errorf("heartbeat: unable to get heartbeat service: %v", err)
 		return err

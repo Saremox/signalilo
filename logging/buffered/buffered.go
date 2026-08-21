@@ -32,14 +32,14 @@ type Logger struct {
 }
 
 // Info implements logging.Logger.
-func (l *Logger) Info(args ...interface{}) {
+func (l *Logger) Info(args ...any) {
 	if l.Enabled() {
 		l.writeLine(l.levelString(), fmt.Sprint(args...))
 	}
 }
 
 // Infof implements logging.Logger.
-func (l *Logger) Infof(format string, args ...interface{}) {
+func (l *Logger) Infof(format string, args ...any) {
 	if l.Enabled() {
 		l.writeLine(l.levelString(), fmt.Sprintf(format, args...))
 	}
@@ -51,12 +51,12 @@ func (l *Logger) Enabled() bool {
 }
 
 // Error implements logging.Logger.
-func (l *Logger) Error(args ...interface{}) {
+func (l *Logger) Error(args ...any) {
 	l.writeLine(levelError, fmt.Sprint(args...))
 }
 
 // Errorf implements logging.Logger.
-func (l *Logger) Errorf(format string, args ...interface{}) {
+func (l *Logger) Errorf(format string, args ...any) {
 	l.writeLine(levelError, fmt.Sprintf(format, args...))
 }
 

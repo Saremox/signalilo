@@ -41,14 +41,12 @@ jobs:
     # branch is in a fork.
     if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go: [ '1.26' ]
-    name: Go install with Go ${{ matrix.go }}
+    name: Go install
     steps:
+    - uses: actions/checkout@v7
     - uses: actions/setup-go@v7
       with:
-        go-version: ${{ matrix.go }}
+        go-version-file: go.mod
     - run: go install -v github.com/saremox/signalilo@${{ github.event.pull_request.head.sha }}
       env:
         GO111MODULE: on
