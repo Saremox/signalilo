@@ -19,6 +19,20 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
+      - name: Set chart version from tag
+        run: |
+          # Stamp the chart's version/appVersion and the default image tag
+          # from the pushed tag (e.g. v0.15.0), so every app release
+          # produces a matching chart release with no manual Chart.yaml
+          # bump required. Chart.yaml's `version` must be plain SemVer (no
+          # leading "v"); appVersion and the image tag keep the "v" to
+          # match the app's own version string and image tags.
+          TAG="$GITHUB_REF_NAME"
+          CHART_VERSION="${TAG#v}"
+          sed -i "s/^version: .*/version: ${CHART_VERSION}/" charts/signalilo/Chart.yaml
+          sed -i "s/^appVersion: .*/appVersion: \"${TAG}\"/" charts/signalilo/Chart.yaml
+          sed -i "s/^  tag: .*/  tag: ${TAG}/" charts/signalilo/values.yaml
+
       - name: Install Helm
         uses: azure/setup-helm@v5
         with:
