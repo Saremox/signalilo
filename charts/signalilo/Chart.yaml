@@ -1,0 +1,17 @@
+apiVersion: v2
+name: signalilo
+description: Alertmanager to Icinga2 bridge
+type: application
+version: 0.1.0
+appVersion: "v0.15.0"
+home: https://github.com/saremox/signalilo
+keywords:
+  - prometheus
+  - alertmanager
+  - webhook
+  - icinga2
+sources:
+  - https://github.com/saremox/signalilo
+maintainers:
+  - name: Saremox
+    url: https://github.com/Saremox
