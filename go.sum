@@ -13,8 +13,8 @@ github.com/prometheus/client_model v0.6.2 h1:oBsgwpGs7iVziMvrGhE53c/GrLUsZdHnqNw
 github.com/prometheus/client_model v0.6.2/go.mod h1:y3m2F6Gdpfy6Ut/GBsUqTWZqCUvMVzSfMLjcu6wAwpE=
 github.com/prometheus/common v0.70.1 h1:1HvjP4D5oL3t8RsPlwxA9onvvStjtIHYE5XuuwOi/PY=
 github.com/prometheus/common v0.70.1/go.mod h1:VdFUQDMZK3VLkurFUVhia6uys/0suUp86TJz5qbJRhc=
-github.com/saremox/go-icinga2-client v0.2.0 h1:Py7huxedh8So0GbfTEzeSFk3Usbr97FofC+nnaVXAjI=
-github.com/saremox/go-icinga2-client v0.2.0/go.mod h1:wi3iMWC3DoNFhCJ9y8mDKAEHCavd7EIV5qcawRLHHIU=
+github.com/saremox/go-icinga2-client v0.2.1 h1:WxyMvevlziX5uAu6oojFa7U45IKFidegleANKQys4y8=
+github.com/saremox/go-icinga2-client v0.2.1/go.mod h1:wi3iMWC3DoNFhCJ9y8mDKAEHCavd7EIV5qcawRLHHIU=
 github.com/sirupsen/logrus v1.10.0 h1:T8MxJJXVZkfcC5zSRMRAg2F8+lxjmUCGGWPzFxO+Msc=
 github.com/sirupsen/logrus v1.10.0/go.mod h1:FXZFonkDAnFozmO+5hGAFvB0Yg9/j2SIhA/QuIkP180=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
